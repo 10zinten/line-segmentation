@@ -2,15 +2,21 @@ import argparse
 import os
 from PIL import Image
 import glob
+import subprocess
 
 
-def page_num(fn, offset):
-    fn = fn.split("/")[-1]
+def page_name(fn, offset):
+    f_dir = fn.split("/")
+    fn = f_dir[-1]
+    vol_dir = os.path.join('output', f_dir[-2])
+    if not os.path.exists(vol_dir):
+            os.makedirs(vol_dir)
     name, ext = fn.split('.')
     prefix, idx = name.split('-')
     idx = int(idx) - offset
-    fn = 'output/preprocess/' + prefix + '-' + str(idx) + '.' + ext
-    return fn
+    fn = prefix + '-' + str(idx) + '.' + ext
+    fn_path = os.path.join(vol_dir, fn)
+    return fn_path
 
 
 def preprocess(fn, offset):
@@ -18,17 +24,23 @@ def preprocess(fn, offset):
        Return: correct page number of Pecha'''
 
     img = Image.open(fn)
+    fn = page_name(fn, offset)
+
     img = img.resize((img.size[0], 500), Image.ANTIALIAS)
-    img.save(page_num(fn, offset), dpi=(300, 300))
+    img.save(fn, dpi=(300, 300))
+    return fn
 
 
 def pageseg(fn):
-    pass
+    cmd = 'ocropus-gpageseg -n ' + fn
+    # subprocess.check_output(cmd)
+    subprocess.call(cmd, shell=True)
 
 def process(path, offset):
     fns = glob.glob(path + "/*")
     for fn in fns:
-        preprocess(fn, offset)
+        fn = preprocess(fn, offset)
+        print(fn)
         pageseg(fn)
 
 
