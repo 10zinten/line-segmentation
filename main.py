@@ -32,7 +32,7 @@ def preprocess(fn, offset):
 
 
 def pageseg(fn):
-    cmd = 'ocropus-gpageseg -n ' + fn
+    cmd = 'ocropus-gpageseg -n --maxlines 7' + fn
     # subprocess.check_output(cmd)
     subprocess.call(cmd, shell=True)
 
