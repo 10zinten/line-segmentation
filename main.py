@@ -23,12 +23,12 @@ def page_length():
 
 
 def download_all_volumes():
-    for code, vol, ln in page_length():
+    for code, vol, ln in page_length()[args.vol-1:]:
         vol_dir = 'data/volumes/' + 'vol-{}'.format(vol)
         if not os.path.exists(vol_dir):
              os.makedirs(vol_dir)
         print('[INFO]  Volume-{} downloading....'.format(vol))
-        for pg in tqdm(range(3, int(ln)+1)):
+        for pg in tqdm(range(args.page, int(ln)+1)):
             url = 'https://www.tbrc.org/browser/ImageService?work=W22084&igroup={}&image={}&first=1&last={}&fetchimg=yes'.format(code, pg+2, ln)
             page_fn = vol_dir + '/page-{0:03d}.png'.format(pg)
             with open(page_fn, 'wb') as f:
@@ -121,9 +121,9 @@ def process():
 
 if __name__ == "__main__":
 
-    # ap = argparse.ArgumentParser(add_help=False)
-    # ap.add_argument("--dir", type=str, help="path to volume")
-    # ap.add_argument("--offset", type=int, help="page offset", default=2)
-    # args = ap.parse_args()
+    ap = argparse.ArgumentParser(add_help=False)
+    ap.add_argument("--vol", type=int, help="volume number", default=1)
+    ap.add_argument("--page", type=int, help="page number", default=3)
+    args = ap.parse_args()
 
     process()
