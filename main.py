@@ -4,6 +4,7 @@ import glob
 import subprocess
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
+from multiprocessing import Process, Queue
 from tqdm import tqdm
 
 import cv2
@@ -16,13 +17,13 @@ def page_length():
     for a in soup.find_all('a'):
         o = a['href'].split('%')
         code = o[1].split('C')[-1]
-        pg = o[2].split('C')[-1]
+        vol = o[2].split('C')[-1]
         ln = o[-1].split('C')[-1]
-        pg_len.append((code, pg, ln))
+        pg_len.append((code, vol, ln))
     return pg_len
 
 
-def download_all_volumes():
+def download_all_volumes(q):
     for code, vol, ln in page_length()[args.vol-1:]:
         vol_dir = 'data/volumes/' + 'vol-{}'.format(vol)
         if not os.path.exists(vol_dir):
@@ -33,7 +34,9 @@ def download_all_volumes():
             page_fn = vol_dir + '/page-{0:03d}.png'.format(pg)
             with open(page_fn, 'wb') as f:
                 f.write(urlopen(url).read())
-            yield page_fn
+
+            # Put page into queue
+            q.put(page_fn)
 
 
 def page_name(fn):
@@ -113,8 +116,10 @@ def pageseg(fn):
     # subprocess.check_output(cmd)
     subprocess.call(cmd, shell=True)
 
-def process():
-    for fn in download_all_volumes():
+def process(q):
+    while True:
+        fn = q.get()
+        if fn is None: break
         fn = preprocess(fn)
         pageseg(fn)
 
@@ -126,4 +131,21 @@ if __name__ == "__main__":
     ap.add_argument("--page", type=int, help="page number", default=3)
     args = ap.parse_args()
 
-    process()
+    q = Queue()
+    NUMBER_OF_PROCESSES = os.cpu_count()
+    print(NUMBER_OF_PROCESSES)
+
+    # Producer download all the volumes
+    producer = Process(target=download_all_volumes, args=(q,))
+    producer.start()
+
+    # Comsumer does all segmentation
+    consumers = [Process(target=process, args=(q, ))
+            for _ in range(NUMBER_OF_PROCESSES)
+        ]
+    for c in consumers:
+        c.start()
+
+    producer.join()
+    for c in consumers:
+        c.join()
