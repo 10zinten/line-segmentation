@@ -13,7 +13,6 @@ vol_path = Path('output/volumes/')
 
 
 def find_img_num(code):
-    print(code)
     pg, _ = code.split('.')
     n = 2*int(pg[:-1])
     if pg[-1] is 'a': n -= 1
@@ -52,7 +51,6 @@ def create_text_dict(nvol, text_fn):
 
     for line in text_lines:
         if is_text_line(line):
-            print(nvol, repr(line))
             raw_text, n = to_raw_text(line)
             text_dict[n].append(raw_text)
     return text_dict
@@ -73,10 +71,8 @@ def create_csv(vol, images, texts):
     all_images, all_texts = [], []
     for k in images:
         if k == 3 or len(texts[k]) == 7:
-            print(vol, len(images), len(images[k]), len(texts), len(texts[k]))
             all_images.extend(images[k])
             all_texts.extend(texts[k])
-    print(len(all_images), len(all_texts))
     df = pd.DataFrame({'filename': all_images, 'text': all_texts})
     df.to_csv(str(vol_path/'{}.csv'.format(vol)), index=False)
     return df
@@ -85,7 +81,6 @@ if __name__ == "__main__":
     for vol in tqdm([o for o in vol_path.iterdir() if o.is_dir()]):
         n = int(vol.name.split('-')[-1])
         texts = create_text_dict(n, text_path/'{0:03d}-tagged.txt'.format(n))
-        print(texts)
         images = create_img_dict(vol)
 
         create_csv('vol-{0:03d}'.format(n), images, texts)
