@@ -32,8 +32,9 @@ def download_all_volumes(q):
         for pg in tqdm(range(args.page, int(ln)+1)):
             url = 'https://www.tbrc.org/browser/ImageService?work=W22084&igroup={}&image={}&first=1&last={}&fetchimg=yes'.format(code, pg+2, ln)
             page_fn = vol_dir + '/page-{0:03d}.png'.format(pg)
-            with open(page_fn, 'wb') as f:
-                f.write(urlopen(url).read())
+            if not os.path.exists(page_fn) or (os.path.isfile(page_fn) and os.path.getsize(page_fn) == 0):
+                with open(page_fn, 'wb') as f:
+                    f.write(urlopen(url).read())
 
             # Put page into queue
             q.put(page_fn)
@@ -133,7 +134,6 @@ if __name__ == "__main__":
 
     q = Queue()
     NUMBER_OF_PROCESSES = os.cpu_count()
-    print(NUMBER_OF_PROCESSES)
 
     # Producer download all the volumes
     producer = Process(target=download_all_volumes, args=(q,))
