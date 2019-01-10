@@ -54,7 +54,7 @@ def preprocess(fn):
     '''Reize the image, set correct page number and set dpi to 300
        Return: correct page number of Pecha'''
 
-    def _remove_border(img):
+    def _get_border_lines(img):
         # Convert to gray scale and threshold
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         ret,thresh = cv2.threshold(gray,150,255,cv2.THRESH_BINARY_INV)
@@ -88,12 +88,66 @@ def preprocess(fn):
         minLineLength = 5000
         maxLineGap = 100
         lines = cv2.HoughLinesP(edged.copy(),1,np.pi/180,100,minLineLength,maxLineGap)
-        try:
-            for line in lines:
-                for x1,y1,x2,y2 in line:
-                    cv2.line(img,(x1,y1),(x2,y2),(255,255,255), 10)
-        except:
-            pass
+
+        return lines
+
+    def _remove_border_text(lines, img):
+
+        def _is_horizontal(line):
+            x1, y1, x2, y2 = line
+            return y1 == y2 and x1 != x2
+
+        def _is_left(line, ref):
+            x1, y1, x2, y2 = line
+            return x1 < ref['left']
+
+        def _is_top(line, ref):
+            x1, y1, x2, y2 = line
+            return y1 < ref['top']
+
+        def _find_rectangle(line, img):
+            ref = {'left': 250, 'right': 2750,
+                   'top': 100, 'bottom': 500}
+            rect = []
+            x1, y1, x2, y2 = line
+            height, width, _ = img.shape
+
+            if _is_horizontal(line):
+				# extends the vertical line till end according to the reference
+                if x2 < ref['left']:
+                    x2 = 0
+                    line[2] = 0
+                if x1 > ref['right']:
+                    x1 = width
+                    line[0] = width
+                rect.append(line)
+
+                if _is_top(line, ref):
+                    rect.append([x1, 0, x2, 0])
+                else:
+                    rect.append([x1, height, x2, height])
+            else:
+				# extends the vertical line till end according to the reference
+                if y2 < ref['top']:
+                    y2 = 0
+                    line[3] = 0
+                if y1 > ref['bottom']:
+                    y1 = height
+                    line[1] = height
+                rect.append(line)
+
+                if _is_left(line, ref):
+                    rect.append([0, y1, 0, y2])
+                else:
+                    rect.append([width, y1, width, y2])
+
+            return rect
+
+        for line in lines:
+            rect = _find_rectangle(line[0], img)
+            tl = tuple(rect[1][:2])
+            br = tuple(rect[0][2:])
+            cv2.rectangle(img, tl, br, (255, 255, 255), -1)
 
         return img
 
@@ -107,8 +161,8 @@ def preprocess(fn):
     fn = page_name(fn)
 
     img = _resize(img)
-    img = _remove_border(img)
-    # img.save(fn, dpi=(300, 300))
+    lines = _get_border_lines(img)
+    img = _remove_border_text(lines, img)
     cv2.imwrite(fn, img)
     return fn
 
