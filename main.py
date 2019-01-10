@@ -143,11 +143,12 @@ def preprocess(fn):
 
             return rect
 
-        for line in lines:
-            rect = _find_rectangle(line[0], img)
-            tl = tuple(rect[1][:2])
-            br = tuple(rect[0][2:])
-            cv2.rectangle(img, tl, br, (255, 255, 255), -1)
+        if len(lines) > 0:
+            for line in lines:
+                rect = _find_rectangle(line[0], img)
+                tl = tuple(rect[1][:2])
+                br = tuple(rect[0][2:])
+                cv2.rectangle(img, tl, br, (255, 255, 255), -1)
 
         return img
 
