@@ -34,13 +34,14 @@ def remove_markup(line):
     return line
 
 def to_raw_text(line):
-    desp, line = line.split(']')
+    idx = line.find("]")
+    desp, line = line[:idx], line[idx+1:]
     desp = desp[1:]
     line = line[:-1]
     return remove_markup(line), find_img_num(desp)
 
 def is_text_line(line):
-    n, line = line.split(']')
+    line = line[line.find("]")+1:]
     return len(line) > 20
 
 def create_text_dict(nvol, text_fn):
@@ -70,7 +71,7 @@ def create_img_dict(vol):
 def create_csv(vol, images, texts):
     all_images, all_texts = [], []
     for k in images:
-        if k == 3 or len(texts[k]) == 7:
+        if (k == 3 and len(images[k]) == 6) or len(texts[k]) == 7:
             all_images.extend(images[k])
             all_texts.extend(texts[k])
     df = pd.DataFrame({'filename': all_images, 'text': all_texts})
