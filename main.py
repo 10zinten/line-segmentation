@@ -143,13 +143,15 @@ def preprocess(fn):
 
             return rect
 
-        if len(lines) > 0:
+        try:
             for line in lines:
                 rect = _find_rectangle(line[0], img)
                 tl = tuple(rect[1][:2])
                 br = tuple(rect[0][2:])
                 cv2.rectangle(img, tl, br, (255, 255, 255), -1)
-
+        except:
+            pass
+        
         return img
 
     def _resize(img):
