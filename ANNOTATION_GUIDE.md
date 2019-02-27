@@ -34,9 +34,21 @@
     - Zoom in the image for better labeling.
     - Construct a polygon that can perfectly surround the side text. ![side-text](https://raw.githubusercontent.com/10zinten/line-segmentation/master/assets/imgs/labelbox-09.gif)
     
+After the labeling is done for one image, click on `SUBMIT` at bottom of side panel to save the label and proceed to next labeling.
+    
 ## 4. Export the label: 
 1. Click on the home button at top of the side panel.
 1. Click the `Export` tab, select `Export Type` as `JSON` and `Label Format` as `XY` and set `Generate Mask` ON.
 1. Finally click on `GENERATE EXPORT`. 
 1. To download the label file, Click on the `Tasks` as top-right and click on the download icon. 
 ![export label](https://raw.githubusercontent.com/10zinten/line-segmentation/master/assets/imgs/labelbox-10.png)
+
+### Simple Example of labelbox annotation:
+![shallow examples](https://raw.githubusercontent.com/10zinten/line-segmentation/master/assets/imgs/page-01.png)
+
+### More Details example of annotations:
+- Please try to annotate the dataset as the following examples.
+- Download the following examples images for better look at places where the top and bottom characters are touched.
+![first](https://raw.githubusercontent.com/10zinten/line-segmentation/master/assets/imgs/page-004-labeled.png)
+![second](https://raw.githubusercontent.com/10zinten/line-segmentation/master/assets/imgs/page-004-labeled.png) 
+![third](https://raw.githubusercontent.com/10zinten/line-segmentation/master/assets/imgs/page-007-labeled.png)
