@@ -1,7 +1,8 @@
 # LabelBox Annotation Guide:
 
 ## 1. Create new project:
-1. After successful sign-up/sign-in under the project tab, click on new project.
+1. Frist Go to ![labelbox](https://labelbox.com/) and create an account.
+1. After successful sign-up/sign-in, under the project tab, click on new project to create a new project.
 1. Give a name to the project. ![Create New Project](https://raw.githubusercontent.com/10zinten/line-segmentation/master/assets/imgs/labelbox-01.png)
 1. Under `Attach Dataset` section, choose the `upload new dataset` to upload the dataset.
 1. Then give a name to the dataset.
