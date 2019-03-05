@@ -4,8 +4,11 @@ from urllib.request import urlopen
 from tqdm import tqdm
 from google_orc import text_annotations
 
+work = '0000'
+igroup = '0000'
 
 def download(args):
+    global work, igroup
     url_seg = args.url.split("&")
     work = url_seg[0].split("=")[-1]
     igroup = url_seg[1].split("=")[-1]
@@ -31,10 +34,11 @@ def orc(pg_fn):
         os.makedirs(output_dir)
     fn = pg_fn.split('/')[-1].split('.')[0] + '.txt'
     output_pg_fn = os.path.join(output_dir, fn)
+    texts = ''
     if not os.path.exists(output_pg_fn):
         texts = text_annotations(pg_fn)
-        with open(output_pg_fn, 'w') as f:
-            f.write(texts)
+    return texts
+
 
 if __name__ == "__main__":
 
@@ -43,5 +47,10 @@ if __name__ == "__main__":
     ap.add_argument("--image", type=int, help="start page number", default=1)
     args = ap.parse_args()
 
+    pages = []
     for pg_fn in download(args):
-        orc(pg_fn)
+        texts = orc(pg_fn)
+        pages.append(texts)
+
+    with open('{}/{}-{}.txt'.format('output', work, igroup), 'w') as f:
+        f.write('\n\n'.join(pages))
