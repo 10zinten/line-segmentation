@@ -151,7 +151,7 @@ def preprocess(fn):
                 cv2.rectangle(img, tl, br, (255, 255, 255), -1)
         except:
             pass
-        
+
         return img
 
     def _resize(img):
@@ -170,7 +170,7 @@ def preprocess(fn):
     return fn
 
 def pageseg(fn):
-    cmd = 'ocropus_venv/bin/python pageseg.py --maxlines 9 --usegauss --maxcolseps 0 ' + fn
+    cmd = 'ocropus_venv/bin/python lib/pageseg.py --maxlines 9 --usegauss --maxcolseps 0 ' + fn
     # subprocess.check_output(cmd)
     subprocess.call(cmd, shell=True)
 
