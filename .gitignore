@@ -1,6 +1,5 @@
 output/
 data/
-lib/
 **/__pycache__/**
 .ipynb_checkpoints/
 .ocropus_venv/
